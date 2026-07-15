@@ -115,6 +115,7 @@ pt-BR:
       seconds: "%{sec}s"
     error_event:
       discarded: Descartado
+      enqueue_failed: Falha ao enfileirar
       handled: Tratado
       interrupted: Interrompido
       retried: Tentado novamente

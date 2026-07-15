@@ -115,6 +115,7 @@ tr:
       seconds: "%{sec}s"
     error_event:
       discarded: Atılan
+      enqueue_failed: Kuyruğa ekleme başarısız
       handled: işlenmiş
       interrupted: kesintiye uğradı
       retried: yeniden denendi

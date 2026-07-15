@@ -115,6 +115,7 @@ fr:
       seconds: "%{sec}s"
     error_event:
       discarded: Mis au rebut
+      enqueue_failed: Mise en file d’attente échouée
       handled: manipulé
       interrupted: Interrompu
       retried: Réessayé

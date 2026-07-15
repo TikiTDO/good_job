@@ -139,6 +139,7 @@ uk:
       seconds: "%{sec}с"
     error_event:
       discarded: Відкинуто
+      enqueue_failed: Не вдалося додати до черги
       handled: Обробляється
       interrupted: Перерваний
       retried: Повторна спроба

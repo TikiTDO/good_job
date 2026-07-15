@@ -115,6 +115,7 @@ zh-CN:
       seconds: "%{sec} 秒"
     error_event:
       discarded: 已丢弃
+      enqueue_failed: 入队失败
       handled: 已处理
       interrupted: 已中断
       retried: 已重试

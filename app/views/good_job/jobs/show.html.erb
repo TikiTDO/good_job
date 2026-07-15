@@ -46,7 +46,7 @@
           <% end %>
         <% end %>
 
-        <% if @job.status == :discarded %>
+        <% if @job.retryable? %>
           <%= button_to retry_job_path(@job.id), method: :put, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: t("good_job.jobs.actions.retry") }, title: t("good_job.jobs.actions.retry"), data: { turbo_confirm: t("good_job.jobs.actions.confirm_retry") } do %>
             <%= render_icon "arrow_clockwise" %>
             <%= t "good_job.actions.retry" %>
@@ -63,6 +63,13 @@
     </div>
   </div>
 </div>
+
+<% if @job.error_event == GoodJob::ErrorEvents::ENQUEUE_FAILED.to_s %>
+  <div class="alert alert-danger" role="alert">
+    <strong><%= t(@job.error_event, scope: "good_job.error_event") %>:</strong>
+    <code class="text-wrap text-break"><%= @job.error %></code>
+  </div>
+<% end %>
 
 <%= render 'good_job/custom_job_details', job: @job %>
 

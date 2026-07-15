@@ -445,6 +445,10 @@ GoodJob includes a Dashboard as a mountable `Rails::Engine`.
 
 _To view finished jobs (succeeded and discarded) on the Dashboard, GoodJob must be configured to preserve job records. Preservation is enabled by default._
 
+When a single job fails during Active Job's enqueue lifecycle before GoodJob can persist it, GoodJob
+records a discarded diagnostic job when preservation is enabled. The diagnostic record intentionally
+omits the job arguments and cannot be retried from the Dashboard.
+
 **Troubleshooting the Dashboard:** Some applications are unable to autoload the Goodjob Engine. To work around this, explicitly require the Engine at the top of your `config/application.rb` file, immediately after Rails is required and before Bundler requires the Rails' groups.
 
 ```ruby

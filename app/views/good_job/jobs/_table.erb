@@ -162,7 +162,7 @@
                         <% end %>
                       </li>
                       <li>
-                        <%= tag.button form: "job_action_form", formaction: retry_job_path(job.id), class: "dropdown-item #{'disabled' unless job_status.in?(job_action_states[:retry])}", title: t("good_job.jobs.actions.retry"), data: { turbo_confirm: t("good_job.jobs.actions.confirm_retry") } do %>
+                        <%= tag.button form: "job_action_form", formaction: retry_job_path(job.id), class: "dropdown-item #{'disabled' unless job_status.in?(job_action_states[:retry]) && job.retryable?}", title: t("good_job.jobs.actions.retry"), data: { turbo_confirm: t("good_job.jobs.actions.confirm_retry") } do %>
                           <%= render_icon "arrow_clockwise" %>
                           <%= t "good_job.actions.retry" %>
                         <% end %>

@@ -115,6 +115,7 @@ ko:
       seconds: "%{sec}초"
     error_event:
       discarded: 폐기됨
+      enqueue_failed: 대기열 등록 실패
       handled: 처리됨
       interrupted: 중단됨
       retried: 다시 시도됨

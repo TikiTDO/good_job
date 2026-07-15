@@ -115,6 +115,7 @@ de:
       seconds: "%{sec}s"
     error_event:
       discarded: Verworfen
+      enqueue_failed: Einreihung fehlgeschlagen
       handled: Abgewickelt
       interrupted: Unterbrochen
       retried: Wiederholt

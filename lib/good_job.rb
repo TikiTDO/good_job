@@ -4,6 +4,7 @@ require "active_job"
 require "active_job/queue_adapters"
 
 require_relative "good_job/version"
+require_relative "good_job/active_job_notifications"
 require_relative "good_job/engine"
 
 require_relative "good_job/adapter"

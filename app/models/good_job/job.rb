@@ -327,6 +327,45 @@ module GoodJob
       new(**enqueue_args(active_job, scheduled_at: scheduled_at))
     end
 
+    # Records an enqueue failure that happened before GoodJob persisted the Active Job.
+    # Arguments are intentionally omitted because they never crossed the queue boundary
+    # and serialization may itself be the source of the failure.
+    def self.record_enqueue_failure(active_job, error)
+      raise ArgumentError unless error.is_a?(Exception)
+      return if active_job.provider_job_id.present? || exists?(active_job_id: active_job.job_id)
+      return unless preserve_enqueue_failure_record?(active_job, error)
+
+      now = Time.current
+      queue_name = active_job.queue_name.presence || DEFAULT_QUEUE_NAME
+      priority = active_job.priority || DEFAULT_PRIORITY
+
+      create!(
+        active_job_id: active_job.job_id,
+        job_class: active_job.class.name,
+        queue_name: queue_name,
+        priority: priority,
+        scheduled_at: active_job.scheduled_at ? Time.zone.at(active_job.scheduled_at) : now,
+        finished_at: now,
+        error: format_error(error),
+        error_event: ErrorEvents::ENQUEUE_FAILED,
+        cron_key: CurrentThread.cron_key,
+        cron_at: CurrentThread.cron_at,
+        serialized_params: {
+          # Keep this deliberately non-constantizable so older GoodJob versions cannot
+          # reconstruct the sanitized record as the original zero-argument job.
+          "job_class" => "GoodJob::EnqueueFailureRecord",
+          "job_id" => active_job.job_id,
+          "queue_name" => queue_name,
+          "priority" => priority,
+          "arguments" => [],
+          "executions" => active_job.executions || 0,
+          "exception_executions" => {},
+        }
+      )
+    rescue ActiveRecord::RecordNotUnique
+      find_by(active_job_id: active_job.job_id)
+    end
+
     # Construct arguments for GoodJob::Job from an ActiveJob instance.
     def self.enqueue_args(active_job, scheduled_at: nil)
       reenqueued_current_job = CurrentThread.active_job_id && CurrentThread.active_job_id == active_job.job_id
@@ -645,6 +684,12 @@ module GoodJob
       finished? && error.present?
     end
 
+    # Tests whether a discarded job has enough persisted data to be retried.
+    # Enqueue-failure records are diagnostic only and intentionally omit arguments.
+    def retryable?
+      discarded? && error_event != ErrorEvents::ENQUEUE_FAILED.to_s
+    end
+
     # Tests whether the job has finished without error
     # @return [Boolean]
     def succeeded?
@@ -658,6 +703,8 @@ module GoodJob
       Rails.application.executor.wrap do
         with_appropriate_lock do |reloaded|
           reload unless reloaded
+          raise ActionForStateMismatchError if error_event == ErrorEvents::ENQUEUE_FAILED.to_s
+
           active_job = self.active_job(ignore_deserialization_errors: true)
 
           raise ActiveJobDeserializationError if active_job.nil?
@@ -1001,6 +1048,18 @@ module GoodJob
 
       false
     end
+
+    def self.preserve_enqueue_failure_record?(active_job, error)
+      return true if CurrentThread.cron_key.present?
+      return true if [true, :on_unhandled_error].include?(GoodJob.preserve_job_records)
+      return false unless GoodJob.preserve_job_records.respond_to?(:call)
+
+      GoodJob.preserve_job_records.call(active_job, error, ErrorEvents::ENQUEUE_FAILED)
+    rescue StandardError => e
+      GoodJob._on_thread_error(e)
+      true
+    end
+    private_class_method :preserve_enqueue_failure_record?
   end
 end
 

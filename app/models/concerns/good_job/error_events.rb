@@ -11,6 +11,7 @@ module GoodJob
     RETRIED = :retried
     RETRY_STOPPED = :retry_stopped
     DISCARDED = :discarded
+    ENQUEUE_FAILED = :enqueue_failed
 
     included do
       error_event_enum = {
@@ -20,6 +21,7 @@ module GoodJob
         RETRIED => 3,
         RETRY_STOPPED => 4,
         DISCARDED => 5,
+        ENQUEUE_FAILED => 6,
       }
       if Gem::Version.new(Rails.version) >= Gem::Version.new('7.1.0.a')
         enum :error_event, error_event_enum, validate: { allow_nil: true }, scopes: false

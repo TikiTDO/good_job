@@ -139,6 +139,7 @@ ru:
       seconds: "%{sec}s"
     error_event:
       discarded: Отклонено
+      enqueue_failed: Не удалось поставить в очередь
       handled: Обработано
       interrupted: Прервано
       retried: Повторная попытка

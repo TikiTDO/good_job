@@ -115,6 +115,7 @@ en:
       seconds: "%{sec}s"
     error_event:
       discarded: Discarded
+      enqueue_failed: Enqueue failed
       handled: Handled
       interrupted: Interrupted
       retried: Retried

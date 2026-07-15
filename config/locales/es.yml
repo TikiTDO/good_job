@@ -115,6 +115,7 @@ es:
       seconds: "%{sec}s"
     error_event:
       discarded: Descartado
+      enqueue_failed: Falló el encolado
       handled: Manejado
       interrupted: interrumpido
       retried: reintentado

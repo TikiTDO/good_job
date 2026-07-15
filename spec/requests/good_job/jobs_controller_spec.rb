@@ -197,4 +197,35 @@ describe GoodJob::JobsController do
       expect(executions[1].serialized_params["locale"]).to eq("es")
     end
   end
+
+  describe 'enqueue failure records' do
+    let!(:job) do
+      active_job = ExampleJob.new('sensitive argument')
+      GoodJob::Job.record_enqueue_failure(active_job, StandardError.new('enqueue failed'))
+    end
+
+    it 'renders the failure in the jobs list' do
+      get good_job.jobs_path
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include('Enqueue failed', 'StandardError: enqueue failed')
+      expect(response.body).not_to include('sensitive argument')
+    end
+
+    it 'renders the failure on the job page without a retry action' do
+      get good_job.job_path(job.id)
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include('Enqueue failed', 'StandardError: enqueue failed')
+      expect(response.body).not_to include(good_job.retry_job_path(job.id))
+    end
+
+    it 'rejects direct retry requests' do
+      put good_job.retry_job_path(job.id)
+
+      expect(response).to have_http_status(:see_other)
+      expect(flash[:alert]).to eq('Job is not in an appropriate state for this action.')
+      expect(job.reload).to have_attributes(error_event: 'enqueue_failed', finished_at: be_present)
+    end
+  end
 end

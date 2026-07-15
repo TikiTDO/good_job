@@ -33,6 +33,12 @@ module GoodJob
       ActiveSupport::Notifications.subscribe "discard.active_job" do |event|
         GoodJob::CurrentThread.error_on_discard = event.payload[:error]
       end
+
+      %w[enqueue.active_job enqueue_at.active_job].each do |notification|
+        ActiveSupport::Notifications.subscribe notification do |event|
+          GoodJob::ActiveJobNotifications.enqueue(event)
+        end
+      end
     end
 
     initializer 'good_job.rails_config' do

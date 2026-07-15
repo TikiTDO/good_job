@@ -115,6 +115,7 @@ nl:
       seconds: "%{sec}s"
     error_event:
       discarded: weggegooid
+      enqueue_failed: In wachtrij plaatsen mislukt
       handled: Afgehandeld
       interrupted: onderbroken
       retried: Opnieuw geprobeerd

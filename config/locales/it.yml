@@ -115,6 +115,7 @@ it:
       seconds: "%{sec}s"
     error_event:
       discarded: Scartato
+      enqueue_failed: Accodamento non riuscito
       handled: Gestito
       interrupted: Interrotto
       retried: Riprovato
